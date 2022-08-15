@@ -1,3 +1,4 @@
+import unittest
 from enum import Enum
 
 
@@ -12,20 +13,27 @@ class Turtle:
     def __init__(self):
         self.x, self.y = 0, 0
         self.direction = Direction.NORTH
+        self.been_there = set()
+        self.been_there.add((0, 0))
 
     def distance_from_origin(self):
-        return self.x + self.y
+        return abs(self.x) + abs(self.y)
 
     def walk_forward(self, distance):
-        match self.direction:
-            case Direction.NORTH:
-                self.y += distance
-            case Direction.EAST:
-                self.x += distance
-            case Direction.SOUTH:
-                self.y -= distance
-            case Direction.WEST:
-                self.x -= distance
+        for _ in range(distance):
+            match self.direction:
+                case Direction.NORTH:
+                    self.y += 1
+                case Direction.EAST:
+                    self.x += 1
+                case Direction.SOUTH:
+                    self.y -= 1
+                case Direction.WEST:
+                    self.x -= 1
+            t = (self.x, self.y)
+            if t in self.been_there:
+                print(f'Been here {t} already. Distance {self.distance_from_origin()}')
+            self.been_there.add(t)
 
     def rotate_left_and_walk_forward(self, distance):
         match self.direction:
@@ -68,7 +76,23 @@ def part_one(filename):
             turtle.rotate_left_and_walk_forward(distance)
         elif rotation == 'R':
             turtle.rotate_right_and_walk_forward(distance)
-    print(f'Distance from origin {turtle.distance_from_origin()}')
+    return turtle.distance_from_origin()
 
+def part_two(filename):
+    data = read_puzzle_input(filename)
+    turtle = Turtle()
+    for d in data:
+        rotation = d[0]
+        distance = int(d[1:])
+        if rotation == 'L':
+            turtle.rotate_left_and_walk_forward(distance)
+        elif rotation == 'R':
+            turtle.rotate_right_and_walk_forward(distance)
+    return turtle.distance_from_origin()
 
-part_one('Day_01_input.txt')
+part_two('Day_01_input.txt')
+
+class TestTurtle(unittest.TestCase):
+    pass
+    # def test_part_one(self):
+    #     self.assertEqual(243, part_one('Day_01_input.txt'))
