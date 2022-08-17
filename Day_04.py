@@ -52,8 +52,45 @@ def part_one(filename):
             sector_id_sum += sector_id
     return sector_id_sum
 
-print(part_one('Day_04_input.txt'))
+
+def shift_letter(letter, sector_id):
+    a = ord(letter)
+    for i in range(sector_id):
+        a += 1
+        if a > ord('z'):
+            a = ord('a')
+    return chr(a)
+
+
+
+def decrypt_name(name, sector_id):
+    decrypted = []
+    for c in name:
+        if c == '-':
+            decrypted.append(' ')
+        else:
+            decrypted.append(shift_letter(c, sector_id))
+    return ''.join(decrypted).strip()
+
+
+def part_two(filename):
+    rooms = read_puzzle_input(filename)
+    for room in rooms:
+        result = re.search(r'^([^\d]+)(\d+)\[(\w+)\]', room)
+        name = result.group(1)
+        sector_id = int(result.group(2))
+        checksum = result.group(3)
+        d_name = decrypt_name(name, sector_id)
+        if d_name == 'northpole object storage':
+            print(f'Decrypted name "{d_name}"  sector ID {sector_id}')
+            return sector_id
+
+
+print(part_two('Day_04_input.txt'))
 
 class Test(unittest.TestCase):
     def test_part_one(self):
         self.assertEqual(1514, part_one('Day_04_short_input.txt'))
+
+    def test_part_two(self):
+        self.assertEqual(482, part_two('Day_04_input.txt'))
